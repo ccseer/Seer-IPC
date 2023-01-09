@@ -1,8 +1,8 @@
-- There are two ways to toggle Seer
+[bool sendPath2Seer(HWND seer, LPCWSTR path)](./mainwindow.cpp)
 
-  - Using `SendMessage`(*recommended*), written in [bool sendPath2Seer(HWND seer, LPCWSTR path)](https://github.com/ccseer/Seer/blob/master/ipc/ACustomApp/mainwindow.cpp)
 
-  - Using command line: `/path/to/Seer.exe the_file_you_need_to_preview`
+<!-- 
+- Using command line: `/path/to/Seer.exe the_file_you_need_to_preview`
 
     - below is the **logic** code of finding Seer's full path in case you need it
     - ```c++
@@ -33,4 +33,4 @@
             return exe;
         }
 
-      ```
+      ``` -->

@@ -38,7 +38,7 @@ void MainWindow::initSeer()
 {
     ///////////////////////////////////////////////////////////////
     /// \brief
-    /// This is how IPC works:
+    /// how IPC works:
     /// The folder for path_json is created when the Seer starts.
     /// 1. we need to create a json file with your classname in it.
     ///    This function(MainWindow::initSeer) is for this purpose.
@@ -57,14 +57,15 @@ void MainWindow::initSeer()
     ///
     /// 5. Finally, Seer gets the SEER_RESPONSE_PATH then preview the file.
 
-    TCHAR filename[256]  = _T("your_unique_file.json");
+    TCHAR filename[256] = _T("your_unique_file.json");
     TCHAR classname[256] = _T(WND_CLASSNAME);
     // if your classname is unique, then no need to pass windowtext
     // TCHAR windowtext[256] ={0};
     TCHAR windowtext[256] = _T(WND_TEXT);
     // 1. prepare file path
     TCHAR path_json[MAX_PATH] = {0};
-    if (FAILED(SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, 0, path_json))) {
+    if (FAILED(SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, 0, path_json)))
+    {
         // should not happen
         OutputDebugString(_T("SHGetFolderPath error\n"));
         return;
@@ -75,7 +76,8 @@ void MainWindow::initSeer()
     // path_doc = %USERPROFILE%\Documents\Seer\explorers
 
     // 2. check file
-    if (!PathFileExists(path_json)) {
+    if (!PathFileExists(path_json))
+    {
         // Seer will try to create the folder everytime it starts.
         // If the folder is not found, then Seer is not installed,
         // or Seer has never been run.
@@ -85,7 +87,8 @@ void MainWindow::initSeer()
     _tcscat(path_json, _T("\\"));
     _tcscat(path_json, filename);
     // path_doc = %USERPROFILE%\Documents\Seer\explorers\file_name
-    if (PathFileExists(path_json)) {
+    if (PathFileExists(path_json))
+    {
         // no need to write again
         OutputDebugString(_T("file exists\n"));
         return;
@@ -94,7 +97,8 @@ void MainWindow::initSeer()
     // 3. write the file
     HANDLE handle = CreateFile(path_json, GENERIC_WRITE, 0, NULL, CREATE_NEW,
                                FILE_ATTRIBUTE_NORMAL, NULL);
-    if (handle == INVALID_HANDLE_VALUE) {
+    if (handle == INVALID_HANDLE_VALUE)
+    {
         // should not happen
         OutputDebugString(_T("CreateFile error\n"));
         return;
@@ -108,7 +112,8 @@ void MainWindow::initSeer()
     buf.append(std::string(wstr.begin(), wstr.end()));
     buf.append("\"");
     wstr = windowtext;
-    if (wstr.length()) {
+    if (wstr.length())
+    {
         buf.append(",\"");
         buf.append(SEER_JSON_KEY_WINDOWTEXT);
         buf.append("\":\"");
@@ -117,10 +122,12 @@ void MainWindow::initSeer()
     }
     buf.append("}");
     bool ret = WriteFile(handle, buf.c_str(), buf.length(), nullptr, nullptr);
-    if (!ret) {
+    if (!ret)
+    {
         OutputDebugString(_T("WriteFile error\n"));
     }
-    else {
+    else
+    {
         /// {
         ///   "classname": "classnanme of your window",
         ///   "windowtext": "windowtext of your window [optional]",
@@ -133,7 +140,8 @@ void MainWindow::initSeer()
 void MainWindow::onCopyDataFromSeer()
 {
     //***function has to be done in 150ms, otherwise it fails***
-    if (HWND h = FindWindowEx(nullptr, nullptr, SEER_CLASS_NAME, nullptr)) {
+    if (HWND h = FindWindowEx(nullptr, nullptr, SEER_CLASS_NAME, nullptr))
+    {
         // send selected file path to Seer
         const QString path_qt = getSelectedFilePath();
         // target file
@@ -145,11 +153,13 @@ void MainWindow::onCopyDataFromSeer()
         cd.cbData = (_tcslen(path) + 1) * sizeof(TCHAR);
         cd.lpData = (LPVOID)path;
         cd.dwData = SEER_RESPONSE_PATH;
-        if (FAILED(SendMessage(h, WM_COPYDATA, 0, (LPARAM)&cd))) {
+        if (FAILED(SendMessage(h, WM_COPYDATA, 0, (LPARAM)&cd)))
+        {
             OutputDebugString(_T("SendMessage error\n"));
         }
     }
-    else {
+    else
+    {
         OutputDebugString(_T("SEER_CLASS_NAME not found\n"));
     }
 }
@@ -159,9 +169,12 @@ void MainWindow::onCopyDataFromSeer()
 bool MainWindow::nativeEvent(const QByteArray &, void *m, long *result)
 {
     const auto msg = (MSG *)m;
-    if (msg->message == WM_COPYDATA) {
-        if (auto cds = (PCOPYDATASTRUCT)msg->lParam) {
-            if (cds->dwData == SEER_REQUEST_PATH) {
+    if (msg->message == WM_COPYDATA)
+    {
+        if (auto cds = (PCOPYDATASTRUCT)msg->lParam)
+        {
+            if (cds->dwData == SEER_REQUEST_PATH)
+            {
                 onCopyDataFromSeer();
                 // LRESULT returns to Seer, but not used currently
                 // *result = 1;
@@ -174,10 +187,12 @@ bool MainWindow::nativeEvent(const QByteArray &, void *m, long *result)
 
 void MainWindow::changeEvent(QEvent *e)
 {
-    if (e->type() == QEvent::ActivationChange && isActiveWindow()) {
-        auto hwnd           = GetForegroundWindow();
+    if (e->type() == QEvent::ActivationChange && isActiveWindow())
+    {
+        auto hwnd = GetForegroundWindow();
         TCHAR buf[MAX_PATH] = {'\0'};
-        if (GetWindowText(hwnd, buf, MAX_PATH)) {
+        if (GetWindowText(hwnd, buf, MAX_PATH))
+        {
             QString info = "WindowText:" + QString::fromWCharArray(buf);
             info.append("\t");
             buf[0] = _T('\0');
@@ -185,7 +200,8 @@ void MainWindow::changeEvent(QEvent *e)
             info.append("ClassName:" + QString::fromWCharArray(buf));
             ui->label_info->setText(info);
         }
-        else {
+        else
+        {
             ui->label_info->setText("GetWindowText Error");
         }
     }
@@ -203,9 +219,10 @@ void MainWindow::initView()
 
 QString MainWindow::getSelectedFilePath() const
 {
-    auto sm         = ui->treeView->selectionModel();
+    auto sm = ui->treeView->selectionModel();
     const auto list = sm->selectedRows(0);
-    for (const auto &i : list) {
+    for (const auto &i : list)
+    {
         auto fsm = qobject_cast<QFileSystemModel *>(ui->treeView->model());
         return fsm->filePath(i);
     }

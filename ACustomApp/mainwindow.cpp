@@ -35,20 +35,6 @@ void sendPath2Seer(HWND seer, LPCWSTR path)
     cd.lpData = (LPVOID)path;
     cd.dwData = SEER_INVOKE_W32;
     SendMessage(seer, WM_COPYDATA, 0, (LPARAM)&cd);
-
-    /*********************
-    * invoke with Qt
-    *********************
-       QByteArray ba;
-       QDataStream ds(&ba, QIODevice::WriteOnly);
-       ds << QString(file_full_path);
-
-       COPYDATASTRUCT cd;
-       cd.cbData = ba.size();
-       cd.lpData = (void *)ba.data();
-       cd.dwData = SEER_INVOKE_QT;
-       auto err = SendMessage(h, WM_COPYDATA, 0, (LPARAM)(LPVOID)&cd);
-    */
 }
 
 /////////////////////////////////////////
@@ -59,7 +45,8 @@ void MainWindow::onSpacebarTriggered()
     qDebug() << "onSpacebarTriggered";
 
     HWND seer = FindWindowEx(nullptr, nullptr, SEER_CLASS_NAME, nullptr);
-    if (!seer) {
+    if (!seer)
+    {
         qDebug() << "seer not found";
         return;
     }
@@ -78,7 +65,8 @@ void MainWindow::onSpacebarTriggered()
 void MainWindow::onSelectedFileChanged()
 {
     HWND seer = FindWindowEx(nullptr, nullptr, SEER_CLASS_NAME, nullptr);
-    if (!seer) {
+    if (!seer)
+    {
         return;
     }
     // Seer is not visible
@@ -86,8 +74,8 @@ void MainWindow::onSelectedFileChanged()
     cd.cbData = 0;
     cd.lpData = nullptr;
     cd.dwData = SEER_IS_VISIBLE;
-    if (SEER_IS_VISIBLE_FALSE
-        == SendMessage(seer, WM_COPYDATA, 0, (LPARAM)&cd)) {
+    if (SEER_IS_VISIBLE_FALSE == SendMessage(seer, WM_COPYDATA, 0, (LPARAM)&cd))
+    {
         return;
     }
 
@@ -95,7 +83,7 @@ void MainWindow::onSelectedFileChanged()
     // then feed Seer with the new file path.
     // a. Sending an empty string has no effect.
     // b. Sending the previewing path closes the Seer window.
-    TCHAR path[MAX_PATH]  = {0};
+    TCHAR path[MAX_PATH] = {0};
     const QString path_qt = getSelectedFilePath();
     path_qt.toWCharArray(path);
 
@@ -118,9 +106,10 @@ void MainWindow::initView()
 
 QString MainWindow::getSelectedFilePath() const
 {
-    auto sm         = ui->treeView->selectionModel();
+    auto sm = ui->treeView->selectionModel();
     const auto list = sm->selectedRows(0);
-    for (const auto &i : list) {
+    for (const auto &i : list)
+    {
         auto fsm = qobject_cast<QFileSystemModel *>(ui->treeView->model());
         return fsm->filePath(i);
     }
